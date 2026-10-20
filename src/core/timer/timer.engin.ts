@@ -229,4 +229,32 @@ export class TimerEngine extends EventEmitter {
     this.emit('timer-complete', this.getState())
     this.UpdateState()
   }
+
+  // starts the timer
+  start(): void {
+    if (this.state.status !== 'idle') {
+      throw new Error('Timer can only start from the idle state.')
+    }
+
+    this.state.status = 'running'
+    this.deadline = Date.now() + this.state.remainingMs
+
+    this.UpdateState()
+    this.scheduleTick()
+  }
+
+  // pauses the timer
+  pause(): void {
+    if (this.state.status !== 'running') {
+      throw new Error('Only a running timer can be paused.')
+    }
+
+    this.state.remainingMs = this.getRemainingTime()
+    this.clearTick()
+    this.state.status = 'paused'
+
+    this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()}.`)
+
+    this.UpdateState()
+  }
 } 

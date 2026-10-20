@@ -5,6 +5,8 @@ import { defaultTimer } from "./timer.config.js";
 export class TimerEngine extends EventEmitter {
   private config: TimerConfig;
   private state: TimerState;
+  private deadline = 0
+
   constructor(config: TimerConfig = defaultTimer) {
     super();
 
@@ -39,7 +41,17 @@ export class TimerEngine extends EventEmitter {
   // get's the current state of the timer and remaining time in milliseconds
   getState(): TimerState {
     return {
-      ...this.state
+      ...this.state,
+      remainingMs: this.getRemainingTime(),
     };
+  }
+
+  // get's remaining time in milliseconds
+  getRemainingTime(): number {
+    if (this.state.status !== 'running') {
+      return this.state.remainingMs
+    }
+
+    return Math.max(0, this.deadline - Date.now())
   }
 } 

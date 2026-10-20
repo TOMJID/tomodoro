@@ -26,6 +26,18 @@ export class TimerEngine extends EventEmitter {
     });
   }
 
+  // get's the title of the current phase for notification
+  private getPhaseTitle(): string {
+    switch (this.state.phase) {
+      case 'work':
+        return 'Work Session';
+      case 'short-break':
+        return 'Short Break';
+      case 'long-break':
+        return 'Long Break';
+    }
+  }
+
   // convert minutes to milliseconds
   private toMilliseconds(min: number): number {
     return min * 60 * 1000;

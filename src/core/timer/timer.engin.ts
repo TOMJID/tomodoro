@@ -245,10 +245,6 @@ export class TimerEngine extends EventEmitter {
 
   // pauses the timer
   pause(): void {
-    if (this.state.status !== 'running') {
-      throw new Error('Only a running timer can be paused.')
-    }
-
     this.state.remainingMs = this.getRemainingTime()
     this.clearTick()
     this.state.status = 'paused'
@@ -257,4 +253,14 @@ export class TimerEngine extends EventEmitter {
 
     this.UpdateState()
   }
+
+  // resumes the timer
+  resume(): void {
+    this.state.status = 'running'
+    this.deadline = Date.now() + this.state.remainingMs
+
+    this.UpdateState()
+    this.scheduleTick()
+  }
+
 } 

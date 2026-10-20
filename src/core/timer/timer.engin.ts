@@ -6,6 +6,7 @@ export class TimerEngine extends EventEmitter {
   private config: TimerConfig;
   private state: TimerState;
   private deadline = 0
+  private interval: ReturnType<typeof setInterval> | undefined
 
   constructor(config: TimerConfig = defaultTimer) {
     super();
@@ -58,5 +59,13 @@ export class TimerEngine extends EventEmitter {
   // state changer
   private UpdateState(): void {
     this.emit('state-change', this.getState())
+  }
+
+  // clears the interval if it exists
+  private clearInterval(): void {
+    if (this.interval !== undefined) {
+      clearInterval(this.interval);
+      this.interval = undefined;
+    }
   }
 } 

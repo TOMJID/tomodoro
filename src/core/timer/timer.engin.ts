@@ -156,7 +156,10 @@ export class TimerEngine extends EventEmitter {
 
     const completedPhase = this.state.phase
 
-    this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()} Phase complete.`)
+    this.notify(
+      this.getPhaseTitle(),
+      'Phase complete!',
+    );
 
     this.emit('phase-complete', this.getState())
 
@@ -241,7 +244,7 @@ export class TimerEngine extends EventEmitter {
     this.state.status = 'completed'
     this.state.remainingMs = 0
 
-    this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()}.`)
+    this.notify(this.getPhaseTitle(), 'Timer complete!')
 
     this.emit('timer-complete', this.getState())
     this.UpdateState()

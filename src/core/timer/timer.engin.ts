@@ -1,6 +1,7 @@
 import { EventEmitter } from "node:events";
 import { TimerConfig, TimerState } from "./timer.type.js";
 import { defaultTimer } from "./timer.config.js";
+import notifier from "node-notifier";
 
 export class TimerEngine extends EventEmitter {
   private config: TimerConfig;
@@ -14,6 +15,17 @@ export class TimerEngine extends EventEmitter {
     this.validateConfig(config);
     this.config = { ...config }
   }
+
+  //desktop notification with node-notifier
+  private notify(title: string, message: string): void {
+    notifier.notify({
+      title,
+      message,
+      sound: true,
+      wait: false,
+    });
+  }
+
   // convert minutes to milliseconds
   private toMilliseconds(min: number): number {
     return min * 60 * 1000;

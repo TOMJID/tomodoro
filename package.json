@@ -10,7 +10,8 @@
   "dependencies": {
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
-    "@oclif/plugin-plugins": "^5"
+    "@oclif/plugin-plugins": "^5",
+    "node-notifier": "^11.0.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1",
@@ -19,6 +20,7 @@
     "@types/chai": "^4",
     "@types/mocha": "^10",
     "@types/node": "^18",
+    "@types/node-notifier": "^8.0.5",
     "chai": "^4",
     "eslint": "^9",
     "eslint-config-oclif": "^6",

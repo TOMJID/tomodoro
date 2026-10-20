@@ -5,7 +5,7 @@ import notifier from "node-notifier";
 
 export class TimerEngine extends EventEmitter {
   private config: TimerConfig;
-  private state: TimerState;
+  private state!: TimerState;
   private deadline = 0
   private interval: ReturnType<typeof setInterval> | undefined
 
@@ -286,6 +286,16 @@ export class TimerEngine extends EventEmitter {
     }
 
     this.transitionTo('work')
+  }
+
+  // cancels the timer
+  cancel(): void {
+    this.clearTick()
+    this.state.status = 'cancelled'
+    this.state.remainingMs = 0
+
+    this.emit('cancelled', this.getState())
+    this.UpdateState()
   }
 
 } 

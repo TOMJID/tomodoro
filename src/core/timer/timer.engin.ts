@@ -54,4 +54,9 @@ export class TimerEngine extends EventEmitter {
 
     return Math.max(0, this.deadline - Date.now())
   }
+
+  // state changer
+  private UpdateState(): void {
+    this.emit('state-change', this.getState())
+  }
 } 

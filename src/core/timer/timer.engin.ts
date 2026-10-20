@@ -5,7 +5,7 @@ import notifier from "node-notifier";
 
 export class TimerEngine extends EventEmitter {
   private config: TimerConfig;
-  private state!: TimerState;
+  private state: TimerState;
   private deadline = 0
   private interval: ReturnType<typeof setInterval> | undefined
 
@@ -14,6 +14,20 @@ export class TimerEngine extends EventEmitter {
 
     this.validateConfig(config);
     this.config = { ...config }
+
+    const durationMs = this.toMilliseconds(
+      this.config.workMin,
+    );
+
+    this.state = {
+      phase: 'work',
+      status: 'idle',
+      durationMs,
+      remainingMs: durationMs,
+      completedWorkSessions: 0,
+      sessionProgress: 0,
+      skippedPhases: 0,
+    };
   }
 
   //desktop notification with node-notifier
@@ -68,14 +82,17 @@ export class TimerEngine extends EventEmitter {
       config.session,
     ];
 
-    // Check if any value is less than or equal to 0
-    if (values.some((value) => value <= 0)) {
-      throw new Error("All timer values must be greater than 0.");
-    }
-
-    // Check if any value is negative
-    if (values.some((value) => value < 0)) {
-      throw new Error("All timer values must be positive numbers.");
+    if (
+      values.some(
+        (value) =>
+          !Number.isFinite(value) ||
+          !Number.isInteger(value) ||
+          value <= 0,
+      )
+    ) {
+      throw new Error(
+        'All timer values must be positive integers.',
+      );
     }
   }
 

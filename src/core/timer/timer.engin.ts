@@ -262,24 +262,29 @@ export class TimerEngine extends EventEmitter {
 
   // pauses the timer
   pause(): void {
-    this.state.remainingMs = this.getRemainingTime()
-    this.clearTick()
-    this.state.status = 'paused'
+    if (this.state.status !== 'running') {
+      throw new Error('Only a running timer can be paused.');
+    }
 
-    this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()}.`)
+    this.state.remainingMs = this.getRemainingTime();
+    this.clearTick();
+    this.state.status = 'paused';
 
-    this.UpdateState()
+    this.UpdateState();
   }
 
   // resumes the timer
   resume(): void {
-    this.state.status = 'running'
-    this.deadline = Date.now() + this.state.remainingMs
+    if (this.state.status !== 'paused') {
+      throw new Error('Only a paused timer can be resumed.');
+    }
 
-    this.UpdateState()
-    this.scheduleTick()
+    this.state.status = 'running';
+    this.deadline = Date.now() + this.state.remainingMs;
+
+    this.UpdateState();
+    this.scheduleTick();
   }
-
   // skips the timer 
   skip(): void {
     this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()}.`)

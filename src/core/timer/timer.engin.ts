@@ -35,4 +35,12 @@ export class TimerEngine extends EventEmitter {
       throw new Error("All timer values must be positive numbers.");
     }
   }
-}
+
+  // get's the current state of the timer and remaining time in milliseconds
+  getState(): TimerState {
+    return {
+      ...this.state,
+      remainingMs: this.state.remainingMs,
+    };
+  }
+} 

@@ -1,11 +1,12 @@
 import { EventEmitter } from "node:events";
-import { TimerConfig, TimerState } from "./timer.type.js";
+import { TimerConfig, TimerState, TimerStatus } from "./timer.type.js";
 import { defaultTimer } from "./timer.config.js";
 import notifier from "node-notifier";
 
 export class TimerEngine extends EventEmitter {
   private config: TimerConfig;
   private state: TimerState;
+  private status: TimerStatus;
   private deadline = 0
   private interval: ReturnType<typeof setInterval> | undefined
 
@@ -35,6 +36,22 @@ export class TimerEngine extends EventEmitter {
         return 'Short Break';
       case 'long-break':
         return 'Long Break';
+    }
+  }
+
+  // get's the message of the current status for notification
+  private getPhaseMessage(): string {
+    switch (this.status) {
+      case 'running':
+        return 'Time to focus on your work!';
+      case 'paused':
+        return 'timer is paused.';
+      case 'completed':
+        return 'Take a break and recharge.';
+      case 'cancelled':
+        return 'Timer has been cancelled.';
+      default:
+        throw new Error(`Unknown timer status: ${this.status}`);
     }
   }
 

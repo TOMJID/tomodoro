@@ -51,7 +51,7 @@ export class TimerEngine extends EventEmitter {
       case 'cancelled':
         return 'Timer has been cancelled.';
       default:
-        throw new Error(`Unknown timer status: ${this.status}`);
+        return '';
     }
   }
 

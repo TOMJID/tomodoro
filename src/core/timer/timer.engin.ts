@@ -263,4 +263,29 @@ export class TimerEngine extends EventEmitter {
     this.scheduleTick()
   }
 
+  // skips the timer 
+  skip(): void {
+    this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()}.`)
+    this.clearTick()
+
+    this.state.skippedPhases += 1
+
+    if (this.state.phase === 'work') {
+      this.state.sessionProgress = Math.min(
+        this.config.session,
+        this.state.sessionProgress + 1,
+      )
+
+      this.transitionTo(this.getBreakAfterWork())
+      return
+    }
+
+    if (this.state.sessionProgress >= this.config.session) {
+      this.finishTimer()
+      return
+    }
+
+    this.transitionTo('work')
+  }
+
 } 

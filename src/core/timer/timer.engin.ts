@@ -39,8 +39,7 @@ export class TimerEngine extends EventEmitter {
   // get's the current state of the timer and remaining time in milliseconds
   getState(): TimerState {
     return {
-      ...this.state,
-      remainingMs: this.state.remainingMs,
+      ...this.state
     };
   }
 } 

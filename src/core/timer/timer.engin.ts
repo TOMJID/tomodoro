@@ -1,12 +1,11 @@
 import { EventEmitter } from "node:events";
-import { TimerConfig, TimerState, TimerStatus } from "./timer.type.js";
+import { TimerConfig, TimerPhase, TimerState, TimerStatus } from "./timer.type.js";
 import { defaultTimer } from "./timer.config.js";
 import notifier from "node-notifier";
 
 export class TimerEngine extends EventEmitter {
   private config: TimerConfig;
   private state: TimerState;
-  private status: TimerStatus;
   private deadline = 0
   private interval: ReturnType<typeof setInterval> | undefined
 
@@ -41,7 +40,7 @@ export class TimerEngine extends EventEmitter {
 
   // get's the message of the current status for notification
   private getPhaseMessage(): string {
-    switch (this.status) {
+    switch (this.state.status) {
       case 'running':
         return 'Time to focus on your work!';
       case 'paused':
@@ -108,5 +107,126 @@ export class TimerEngine extends EventEmitter {
       clearInterval(this.interval);
       this.interval = undefined;
     }
+  }
+
+  // clears the tick interval and sets it to undefined
+  private clearTick(): void {
+    this.clearInterval()
+  }
+
+  // updates the remaining time and emits a tick event every second
+  private scheduleTick(): void {
+    this.clearTick()
+
+    this.interval = setInterval(() => {
+      if (this.state.status !== 'running') {
+        return
+      }
+
+      this.state.remainingMs = this.getRemainingTime()
+      this.emit('tick', this.getState())
+
+      if (this.state.remainingMs <= 0) {
+        this.completePhase()
+      }
+    }, 1000)
+  }
+
+  // handles the completion of a phase 
+  private completePhase(): void {
+    this.clearTick()
+    this.state.remainingMs = 0
+
+    const completedPhase = this.state.phase
+
+    this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()} Phase complete.`)
+
+    this.emit('phase-complete', this.getState())
+
+    // naturally finished work counts as completed work.
+    if (completedPhase === 'work') {
+      this.state.completedWorkSessions += 1
+      this.state.sessionProgress = Math.min(
+        this.config.session,
+        this.state.sessionProgress + 1,
+      )
+
+      this.emit('session-complete', this.getState())
+
+      // Include a break after the final work session.
+      this.transitionTo(this.getBreakAfterWork())
+      return
+    }
+
+    // The final break has finished.
+    if (this.state.sessionProgress >= this.config.session) {
+      this.finishTimer()
+      return
+    }
+
+    this.transitionTo('work')
+  }
+
+  // determines whether short or long break after a work session
+  private getBreakAfterWork(): TimerPhase {
+    if (
+      this.state.sessionProgress >= this.config.session ||
+      (
+        this.state.sessionProgress > 0 &&
+        this.state.sessionProgress % 4 === 0
+      )
+    ) {
+      return 'long-break'
+    }
+
+    return 'short-break'
+  }
+
+  // transitions to the next phase and sets
+  private transitionTo(phase: TimerPhase): void {
+    this.clearTick()
+
+    const durationMinutes = this.getDurationMinutes(phase)
+    const durationMs = this.toMilliseconds(durationMinutes)
+
+    this.state = {
+      ...this.state,
+      phase,
+      status: 'running',
+      durationMs,
+      remainingMs: durationMs,
+    }
+
+    this.deadline = Date.now() + durationMs
+
+    this.UpdateState()
+    this.scheduleTick()
+  }
+
+  // get's the duration in minutes
+  private getDurationMinutes(phase: TimerPhase): number {
+    switch (phase) {
+      case 'work':
+        return this.config.workMin
+
+      case 'short-break':
+        return this.config.shortBreakMin
+
+      case 'long-break':
+        return this.config.longBreakMin
+    }
+  }
+
+  // handles the completion of the entire timer
+  private finishTimer(): void {
+    this.clearTick()
+
+    this.state.status = 'completed'
+    this.state.remainingMs = 0
+
+    this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()}.`)
+
+    this.emit('timer-complete', this.getState())
+    this.UpdateState()
   }
 } 

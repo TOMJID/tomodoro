@@ -25,3 +25,10 @@ export interface TimerEvents {
   timerComplete: TimerState
   cancelled: TimerState
 }
+
+export interface TimerConfig {
+  workMin: number
+  shortBreakMin: number
+  longBreakMin: number
+  session: number
+}

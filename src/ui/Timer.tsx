@@ -56,6 +56,13 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
     }
   }, [engine])
 
+  // Start the first work session as soon as the timer is displayed.
+  useEffect(() => {
+    if (engine.getState().status === "idle") {
+      engine.start()
+    }
+  }, [engine])
+
   // Keep the display synchronized with the engine's deadline between ticks.
   useEffect(() => {
     if (state.status !== "running") {
@@ -85,9 +92,28 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
     timerConfig.session,
     state.sessionProgress + (state.phase === "work" ? 1 : 0),
   )
+  const completedSessions = state.sessionProgress
   const streak = state.completedWorkSessions
   const barWidth = 30
   const timerBar = makeProgressBar(timerProgress, barWidth)
+  const phaseLabel = {
+    work: "WORK",
+    "short-break": "SHORT BREAK",
+    "long-break": "LONG BREAK",
+  }[state.phase]
+  const phaseColors = {
+    work: "green",
+    "short-break": "blue",
+    "long-break": "blue",
+  } as const
+  const phaseColor = phaseColors[state.phase]
+  const statusTheme = {
+    idle: { label: "READY", color: "white" as const },
+    running: { label: "FOCUSING", color: phaseColor },
+    paused: { label: "PAUSED", color: "yellow" as const },
+    completed: { label: "COMPLETE", color: "magenta" as const },
+    cancelled: { label: "CANCELLED", color: "red" as const },
+  }[state.status]
 
   // keyboard controls
   useInput((input, key) => {
@@ -134,12 +160,16 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
       flexDirection="column"
       padding={2}
       borderStyle="double"
+      borderColor={statusTheme.color}
     >
       {/* title */}
       <Box flexDirection="column" alignItems="center">
         < Gradient name="morning">
           <BigText text="Tomodoro" font="chrome" />
         </Gradient>
+        <Text bold color={statusTheme.color}>
+          {statusTheme.label} · {phaseLabel}
+        </Text>
       </Box>
 
       {/* timer */}
@@ -164,7 +194,7 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
           </Text>
         </Box>
 
-        <Text >
+        <Text color={statusTheme.color}>
           [{timerBar}]
         </Text>
 
@@ -188,28 +218,30 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
       <Box
         flexDirection="row"
         justifyContent="space-around"
-        borderStyle='single'
-        borderColor='gray'
+        borderStyle='round'
+        borderColor={statusTheme.color}
       >
         <Box flexDirection="column" alignItems="center">
-          <Text bold>{state.completedWorkSessions}</Text>
+          <Text bold color={statusTheme.color}>
+            {completedSessions}
+          </Text>
           <Text dimColor>DONE</Text>
         </Box>
 
         <Box flexDirection="column" alignItems="center">
-          <Text bold>
+          <Text bold color={statusTheme.color}>
             {currentSession}/{timerConfig.session}
           </Text>
           <Text dimColor>SESSION</Text>
         </Box>
 
         <Box flexDirection="column" alignItems="center">
-          <Text bold>{streak}</Text>
+          <Text bold color={statusTheme.color}>{streak}</Text>
           <Text dimColor>STREAK</Text>
         </Box>
 
         <Box flexDirection="column" alignItems="center">
-          <Text bold>{state.skippedPhases}</Text>
+          <Text bold color={statusTheme.color}>{state.skippedPhases}</Text>
           <Text dimColor>SKIPS</Text>
         </Box>
       </Box>
@@ -219,11 +251,11 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
         flexDirection="column"
         justifyContent="center"
         alignItems="center"
-        borderStyle='single'
+        borderStyle='round'
+        borderColor={statusTheme.color}
         padding={1}
-        marginTop={1}
       >
-        <Text dimColor>
+        <Text color={statusTheme.color}>
           SPACE: Play/Pause | S: Skip | Q: Quit
         </Text>
 

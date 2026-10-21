@@ -98,6 +98,7 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
     <Box
       flexDirection="column"
       paddingY={0}
+      borderStyle="double"
     >
       {/* title */}
       <Box flexDirection="column" alignItems="center">

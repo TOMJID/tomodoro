@@ -76,7 +76,10 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
       : 0
   const cycleProgress =
     timerConfig.session > 0
-      ? state.sessionProgress / timerConfig.session
+      ? Math.max(
+        0,
+        Math.min(1, state.sessionProgress / timerConfig.session),
+      )
       : 0
   const currentSession = Math.min(
     timerConfig.session,
@@ -109,8 +112,6 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
           currentState.status === "running" ||
           currentState.status === "paused"
         ) {
-          engine.cancel()
-        } else if (currentState.status === "idle") {
           engine.skip()
         }
 
@@ -131,7 +132,7 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
   return (
     <Box
       flexDirection="column"
-      paddingY={0}
+      padding={2}
       borderStyle="double"
     >
       {/* title */}

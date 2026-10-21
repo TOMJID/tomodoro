@@ -356,7 +356,26 @@ _See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/
 
 ```
 USAGE
-  $ tomodoro start
+  $ tomodoro start [--work <value>] [--short-break <value>] [--long-break <value>] [--session <value>]
+
+FLAGS
+  --long-break=<value>   [default: 15] long break duration in minutes
+  --session=<value>      [default: 4] number of work/break cycles before a long break
+  --short-break=<value>  [default: 5] short break duration in minutes
+  --work=<value>         [default: 25] work duration in minutes
+
+EXAMPLES
+  $ tomodoro start , starts the timer with default settings
+
+  $ tomodoro start --work 50
+
+  $ tomodoro start --work 50 --long-break 15
+
+  $ tomodoro start --work 50 --short-break 10
+
+  $ tomodoro start --work 50 --long-break 15 --short-break 10
+
+  $ tomodoro start --sessions 4
 ```
 
 _See code: [src/commands/start.ts](https://github.com/Projects/tomodoro/blob/v0.0.0/src/commands/start.ts)_

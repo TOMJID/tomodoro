@@ -54,7 +54,12 @@ export default class Start extends Command {
       <Timer
         timerConfig={timerConfig}
         engine={timerEngine}
-      />
+      />,
+      {
+        interactive: true,
+        incrementalRendering: false,
+        alternateScreen: true,
+      },
     )
     await instance.waitUntilExit()
   }

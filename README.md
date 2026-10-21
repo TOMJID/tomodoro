@@ -20,7 +20,7 @@ $ npm install -g tomodoro
 $ tomodoro COMMAND
 running command...
 $ tomodoro (--version)
-tomodoro/0.0.0 linux-x64 node-v24.22.0
+tomodoro/1.0.0 linux-x64 node-v24.22.0
 $ tomodoro --help [COMMAND]
 USAGE
   $ tomodoro COMMAND
@@ -367,16 +367,16 @@ FLAGS
 EXAMPLES
   $ tomodoro start , starts the timer with default settings
 
-  $ tomodoro start --work 50
+  $ tomodoro start --work 50 , starts the timer with a work duration of 50 minutes
 
-  $ tomodoro start --work 50 --long-break 15
+  $ tomodoro start --work 50 --long-break 15 , starts the timer with a work duration of 50 minutes and a long break of 15 minutes
 
-  $ tomodoro start --work 50 --short-break 10
+  $ tomodoro start --work 50 --short-break 10 , starts the timer with a work duration of 50 minutes and a short break of 10 minutes
 
-  $ tomodoro start --work 50 --long-break 15 --short-break 10
+  $ tomodoro start --work 50 --long-break 15 --short-break 10 , starts the timer with a work duration of 50 minutes, a long break of 15 minutes, and a short break of 10 minutes
 
-  $ tomodoro start --sessions 4
+  $ tomodoro start --session 4 , starts the timer with 4 sessions
 ```
 
-_See code: [src/commands/start.ts](https://github.com/Projects/tomodoro/blob/v0.0.0/src/commands/start.ts)_
+_See code: [src/commands/start.ts](https://github.com/Projects/tomodoro/blob/v1.0.0/src/commands/start.ts)_
 <!-- commandsstop -->

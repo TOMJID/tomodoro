@@ -25,6 +25,7 @@
     "@types/mocha": "^10",
     "@types/node": "^18",
     "@types/node-notifier": "^8.0.5",
+    "@types/react": "^19.3.0",
     "chai": "^4",
     "eslint": "^9",
     "eslint-config-oclif": "^6",

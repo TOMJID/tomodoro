@@ -1,7 +1,9 @@
-import { useInput } from "ink"
+import { Box, useInput } from "ink"
 import { TimerEngine } from "../core/timer/timer.engin.js"
 import { TimerConfig } from "../core/timer/timer.type.js"
 import { exit } from "process"
+import Gradient from "ink-gradient"
+import BigText from "ink-big-text"
 
 interface TimerProps {
   timerConfig: TimerConfig
@@ -37,4 +39,29 @@ const Timer = ({ timerConfig, engine }: TimerProps) => {
       console.error("Error occurred while handling input:", error)
     }
   })
+
+  return (
+    <Box
+      flexDirection="column"
+      paddingY={0}
+    >
+      {/* title */}
+      <Box flexDirection="column" alignItems="center">
+        < Gradient name="rainbow">
+          <BigText text="Tomodoro" font="block" />
+        </Gradient>
+      </Box>
+
+      {/* timer */}
+      <Box flexDirection="column" alignItems="center">
+        <Gradient name="cristal">
+          <BigText
+            text={formatTime(state.remainingMs)}
+            font="simple"
+          />
+        </Gradient>
+      </Box>
+
+    </Box>
+  )
 }

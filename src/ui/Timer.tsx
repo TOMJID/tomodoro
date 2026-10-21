@@ -55,6 +55,11 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
     timerConfig.session > 0
       ? state.sessionProgress / timerConfig.session
       : 0
+  const currentSession = Math.min(
+    timerConfig.session,
+    state.sessionProgress + (state.phase === "work" ? 1 : 0),
+  )
+  const streak = state.completedWorkSessions
   const barWidth = 30
   const timerBar = makeProgressBar(timerProgress, barWidth)
 
@@ -141,6 +146,36 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
         <Text >
           [{makeProgressBar(cycleProgress, barWidth)}]
         </Text>
+      </Box>
+
+      {/* status and stats */}
+      <Box
+        flexDirection="row"
+        justifyContent="space-around"
+        borderStyle='single'
+        borderColor='gray'
+      >
+        <Box flexDirection="column" alignItems="center">
+          <Text bold>{state.completedWorkSessions}</Text>
+          <Text dimColor>DONE</Text>
+        </Box>
+
+        <Box flexDirection="column" alignItems="center">
+          <Text bold>
+            {currentSession}/{timerConfig.session}
+          </Text>
+          <Text dimColor>SESSION</Text>
+        </Box>
+
+        <Box flexDirection="column" alignItems="center">
+          <Text bold>{streak}</Text>
+          <Text dimColor>STREAK</Text>
+        </Box>
+
+        <Box flexDirection="column" alignItems="center">
+          <Text bold>{state.skippedPhases}</Text>
+          <Text dimColor>SKIPS</Text>
+        </Box>
       </Box>
     </Box>
   )

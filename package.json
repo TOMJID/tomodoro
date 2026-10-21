@@ -1,12 +1,11 @@
 {
   "name": "tomodoro",
   "description": "A new CLI generated with oclif",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "TOMJID",
   "bin": {
     "tomodoro": "./bin/run.js"
   },
-  "bugs": "https://github.com/Projects/tomodoro/issues",
   "dependencies": {
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
@@ -63,8 +62,8 @@
     ],
     "topicSeparator": " ",
     "topics": {
-      "hello": {
-        "description": "Say hello to the world and others"
+      "start": {
+        "description": "Starts the timer cli"
       }
     }
   },

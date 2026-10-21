@@ -40,9 +40,9 @@ export class TimerEngine extends EventEmitter {
     });
   }
 
-  // get's the title of the current phase for notification
-  private getPhaseTitle(): string {
-    switch (this.state.phase) {
+  // gets the title of a timer phase for notification
+  private getPhaseTitle(phase: TimerPhase = this.state.phase): string {
+    switch (phase) {
       case 'work':
         return 'Work Session';
       case 'short-break':
@@ -52,20 +52,28 @@ export class TimerEngine extends EventEmitter {
     }
   }
 
-  // get's the message of the current status for notification
-  private getPhaseMessage(): string {
-    switch (this.state.status) {
-      case 'running':
-        return 'Time to focus on your work!';
-      case 'paused':
-        return 'timer is paused.';
-      case 'completed':
-        return 'Take a break and recharge.';
-      case 'cancelled':
-        return 'Timer has been cancelled.';
-      default:
-        return '';
+  private getNextPhaseAfterCurrent(): TimerPhase | undefined {
+    if (this.state.phase === 'work') {
+      const projectedProgress = Math.min(
+        this.config.session,
+        this.state.sessionProgress + 1,
+      );
+
+      if (
+        projectedProgress >= this.config.session ||
+        projectedProgress % 4 === 0
+      ) {
+        return 'long-break';
+      }
+
+      return 'short-break';
     }
+
+    if (this.state.sessionProgress < this.config.session) {
+      return 'work';
+    }
+
+    return undefined;
   }
 
   // convert minutes to milliseconds
@@ -155,10 +163,13 @@ export class TimerEngine extends EventEmitter {
     this.state.remainingMs = 0
 
     const completedPhase = this.state.phase
+    const nextPhase = this.getNextPhaseAfterCurrent()
 
     this.notify(
-      this.getPhaseTitle(),
-      'Phase complete!',
+      `${this.getPhaseTitle(completedPhase)} complete`,
+      nextPhase
+        ? `${this.getPhaseTitle(nextPhase)} starts now.`
+        : 'The timer is complete.',
     );
 
     this.emit('phase-complete', this.getState())
@@ -290,7 +301,15 @@ export class TimerEngine extends EventEmitter {
   }
   // skips the timer 
   skip(): void {
-    this.notify(this.getPhaseTitle(), `${this.getPhaseMessage()}.`)
+    const skippedPhase = this.state.phase
+    const nextPhase = this.getNextPhaseAfterCurrent()
+
+    this.notify(
+      `${this.getPhaseTitle(skippedPhase)} skipped`,
+      nextPhase
+        ? `${this.getPhaseTitle(nextPhase)} starts now.`
+        : 'The timer is complete.',
+    )
     this.clearTick()
 
     this.state.skippedPhases += 1

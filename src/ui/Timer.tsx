@@ -25,9 +25,19 @@ const formatTime = (remainingMs: number): string => {
 // create a progress bar string based on the progress percentage and width
 function makeProgressBar(progress: number, width: number): string {
   const safeProgress = Math.max(0, Math.min(1, progress))
-  const filled = Math.round(safeProgress * width)
+  const partialBlocks = ["", "▏", "▎", "▍", "▌", "▋", "▊", "▉"]
+  const exactBlocks = safeProgress * width
+  let filled = Math.floor(exactBlocks)
+  const partialIndex = Math.round((exactBlocks - filled) * 8)
 
-  return '█'.repeat(filled) + '░'.repeat(width - filled)
+  if (partialIndex === 8) {
+    filled += 1
+  }
+
+  const partial = partialIndex === 8 ? "" : partialBlocks[partialIndex]
+  const empty = width - filled - (partial === "" ? 0 : 1)
+
+  return "█".repeat(filled) + partial + "░".repeat(Math.max(0, empty))
 }
 
 export const Timer = ({ timerConfig, engine }: TimerProps) => {
@@ -46,10 +56,23 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
     }
   }, [engine])
 
+  // Keep the display synchronized with the engine's deadline between ticks.
+  useEffect(() => {
+    if (state.status !== "running") {
+      return
+    }
+
+    const animation = setInterval(() => {
+      setState(engine.getState())
+    }, 100)
+
+    return () => clearInterval(animation)
+  }, [engine, state.status])
+
   // calculate progress for timer and session
   const timerProgress =
     state.durationMs > 0
-      ? 1 - state.remainingMs / state.durationMs
+      ? Math.max(0, Math.min(1, 1 - state.remainingMs / state.durationMs))
       : 0
   const cycleProgress =
     timerConfig.session > 0
@@ -134,7 +157,7 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
 
       >
         <Box justifyContent="flex-start" marginBottom={0}>
-          <Text>TIME REMAINING </Text>
+          <Text>Progress </Text>
           <Text>
             ({Math.round(Math.max(0, Math.min(1, timerProgress)) * 100)}%)
           </Text>

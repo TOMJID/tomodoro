@@ -23,7 +23,7 @@ export default class Start extends Command {
       default: defaultTimer.longBreakMin,
       min: 1,
     }),
-    Session: Flags.integer({
+    session: Flags.integer({
       description: 'number of work/break cycles before a long break',
       default: defaultTimer.session,
       min: 1,
@@ -38,7 +38,7 @@ export default class Start extends Command {
       workMin: flags.work,
       shortBreakMin: flags['short-break'],
       longBreakMin: flags['long-break'],
-      session: flags.Session,
+      session: flags.session,
     }
 
     // validating user input

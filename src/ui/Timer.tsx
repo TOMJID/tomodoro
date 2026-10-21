@@ -66,25 +66,36 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
   // keyboard controls
   useInput((input, key) => {
     const normalizedInput = input.toLowerCase()
-    try {
+    const currentState = engine.getState()
 
+    try {
       if (normalizedInput === "p" || normalizedInput === " ") {
-        if (state.status === "running") {
-          engine.pause()
-        } else if (state.status === "paused") {
-          engine.resume()
-        } else {
-          engine.start()
+        switch (currentState.status) {
+          case "idle":
+            engine.start()
+            break
+          case "running":
+            engine.pause()
+            break
+          case "paused":
+            engine.resume()
+            break
         }
       } else if (normalizedInput === "s") {
-        if (state.status === "running" || state.status === "paused") {
+        if (
+          currentState.status === "running" ||
+          currentState.status === "paused"
+        ) {
           engine.cancel()
-        } else if (state.status === "idle") {
+        } else if (currentState.status === "idle") {
           engine.skip()
         }
 
       } else if (normalizedInput === "q" || key.escape) {
-        if (state.status !== "completed" && state.status !== "cancelled") {
+        if (
+          currentState.status !== "completed" &&
+          currentState.status !== "cancelled"
+        ) {
           engine.cancel()
         }
         exit()

@@ -2,12 +2,28 @@ import { EventEmitter } from "node:events";
 import { TimerConfig, TimerPhase, TimerState, TimerStatus } from "./timer.type.js";
 import { defaultTimer } from "./timer.config.js";
 import notifier from "node-notifier";
+import playSound from "play-sound";
+import { fileURLToPath } from "node:url";
+
+const skipSoundPath = fileURLToPath(
+  new URL("../../assets/sound/skip.mp3", import.meta.url),
+);
+const sessionSoundPath = fileURLToPath(
+  new URL("../../assets/sound/session.mp3", import.meta.url),
+);
+const doneSoundPath = fileURLToPath(
+  new URL("../../assets/sound/done.mp3", import.meta.url),
+);
+const pauseSoundPath = fileURLToPath(
+  new URL("../../assets/sound/pause.mp3", import.meta.url),
+);
 
 export class TimerEngine extends EventEmitter {
   private config: TimerConfig;
   private state: TimerState;
   private deadline = 0
   private interval: ReturnType<typeof setInterval> | undefined
+  private player = playSound({});
 
   constructor(config: TimerConfig = defaultTimer) {
     super();
@@ -28,6 +44,15 @@ export class TimerEngine extends EventEmitter {
       sessionProgress: 0,
       skippedPhases: 0,
     };
+  }
+
+  // sound player with play-sound package
+  private playSound(soundPath: string): void {
+    this.player.play(soundPath, (err) => {
+      if (err) {
+        console.error('Error playing sound:', err);
+      }
+    });
   }
 
   //desktop notification with node-notifier
@@ -172,6 +197,8 @@ export class TimerEngine extends EventEmitter {
         : 'The timer is complete.',
     );
 
+    this.playSound(doneSoundPath);
+
     this.emit('phase-complete', this.getState())
 
     // naturally finished work counts as completed work.
@@ -183,6 +210,7 @@ export class TimerEngine extends EventEmitter {
       )
 
       this.emit('session-complete', this.getState())
+      this.playSound(sessionSoundPath);
 
       // Include a break after the final work session.
       this.transitionTo(this.getBreakAfterWork())
@@ -256,6 +284,7 @@ export class TimerEngine extends EventEmitter {
     this.state.remainingMs = 0
 
     this.notify(this.getPhaseTitle(), 'Timer complete!')
+    this.playSound(sessionSoundPath);
 
     this.emit('timer-complete', this.getState())
     this.UpdateState()
@@ -284,6 +313,7 @@ export class TimerEngine extends EventEmitter {
     this.clearTick();
     this.state.status = 'paused';
 
+    this.playSound(pauseSoundPath);
     this.UpdateState();
   }
 
@@ -312,6 +342,7 @@ export class TimerEngine extends EventEmitter {
     )
     this.clearTick()
 
+    this.playSound(skipSoundPath);
     this.state.skippedPhases += 1
 
     if (this.state.phase === 'work') {

@@ -1,4 +1,5 @@
 import { Box, useInput } from "ink"
+import { useEffect, useState } from "react"
 import { TimerEngine } from "../core/timer/timer.engin.js"
 import { TimerConfig } from "../core/timer/timer.type.js"
 import { exit } from "process"
@@ -10,27 +11,56 @@ interface TimerProps {
   engine: TimerEngine
 }
 
-const Timer = ({ timerConfig, engine }: TimerProps) => {
+// format remaining time in mm:ss format
+const formatTime = (remainingMs: number): string => {
+  const totalSeconds = Math.ceil(remainingMs / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`
+}
+
+
+export const Timer = ({ engine }: TimerProps) => {
+  const [state, setState] = useState(() => engine.getState())
+
+  // loading the engine
+  useEffect(() => {
+    const updateState = () => setState(engine.getState())
+
+    engine.on("state-change", updateState)
+    engine.on("tick", updateState)
+
+    return () => {
+      engine.off("state-change", updateState)
+      engine.off("tick", updateState)
+    }
+  }, [engine])
+
   // keyboard controls
   useInput((input, key) => {
     const normalizedInput = input.toLowerCase()
     try {
 
       if (normalizedInput === "p" || normalizedInput === " ") {
-        if (engine.status === "running") {
+        if (state.status === "running") {
           engine.pause()
+        } else if (state.status === "paused") {
+          engine.resume()
         } else {
           engine.start()
         }
       } else if (normalizedInput === "s") {
-        if (engine.status === "running" || engine.status === "paused") {
-          engine.stop()
-        } {
+        if (state.status === "running" || state.status === "paused") {
+          engine.cancel()
+        } else if (state.status === "idle") {
           engine.skip()
         }
 
       } else if (normalizedInput === "q" || key.escape) {
-        if (state.status !== 'completed' && state.status !== 'cancelled') {
+        if (state.status !== "completed" && state.status !== "cancelled") {
           engine.cancel()
         }
         exit()
@@ -40,6 +70,9 @@ const Timer = ({ timerConfig, engine }: TimerProps) => {
     }
   })
 
+  const font = [
+    "3d", "block", "chrome", "grid", "huge", "tiny", "shade", "slick", "pallet", "simple", "simpleBlock", "simple3d"
+  ] as const
   return (
     <Box
       flexDirection="column"
@@ -47,8 +80,8 @@ const Timer = ({ timerConfig, engine }: TimerProps) => {
     >
       {/* title */}
       <Box flexDirection="column" alignItems="center">
-        < Gradient name="rainbow">
-          <BigText text="Tomodoro" font="block" />
+        < Gradient name="morning">
+          <BigText text="Tomodoro" font="chrome" />
         </Gradient>
       </Box>
 
@@ -56,8 +89,7 @@ const Timer = ({ timerConfig, engine }: TimerProps) => {
       <Box flexDirection="column" alignItems="center">
         <Gradient name="cristal">
           <BigText
-            text={formatTime(state.remainingMs)}
-            font="simple"
+            text={formatTime(state.remainingMs)} font='chrome'
           />
         </Gradient>
       </Box>

@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/commands/start.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/commands/start.tsx","./src/core/timer/timer.config.ts","./src/core/timer/timer.engin.ts","./src/core/timer/timer.type.ts","./src/ui/Timer.tsx"],"version":"5.9.3"}

@@ -177,6 +177,21 @@ export const Timer = ({ timerConfig, engine }: TimerProps) => {
           <Text dimColor>SKIPS</Text>
         </Box>
       </Box>
+
+      {/* KEYBOARD SHORTCUTS */}
+      <Box
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        borderStyle='single'
+        padding={1}
+        marginTop={1}
+      >
+        <Text dimColor>
+          SPACE: Play/Pause | S: Skip | Q: Quit
+        </Text>
+
+      </Box>
     </Box>
   )
 }

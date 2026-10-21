@@ -47,13 +47,21 @@ export class TimerEngine extends EventEmitter {
   }
 
   // sound player with play-sound package
-  // private playSound(soundPath: string): void {
-  //   this.player.play(soundPath, (err) => {
-  //     if (err) {
-  //       console.error('Error playing sound:', err);
-  //     }
-  //   });
-  // }
+  private playSound(soundPath: string): void {
+    this.player.play(
+      soundPath,
+      {
+        afplay: ['-v', '0.2'],
+        mpg123: ['-f', '6554'],
+        play: ['-v', '0.2'],
+      },
+      (err) => {
+        if (err) {
+          console.error('Error playing sound:', err);
+        }
+      },
+    );
+  }
 
   //desktop notification with node-notifier
   private notify(title: string, message: string): void {
@@ -197,7 +205,7 @@ export class TimerEngine extends EventEmitter {
         : 'The timer is complete.',
     );
 
-    // this.playSound(doneSoundPath);
+    this.playSound(doneSoundPath);
 
     this.emit('phase-complete', this.getState())
 
@@ -210,7 +218,7 @@ export class TimerEngine extends EventEmitter {
       )
 
       this.emit('session-complete', this.getState())
-      // this.playSound(sessionSoundPath);
+      this.playSound(sessionSoundPath);
 
       // Include a break after the final work session.
       this.transitionTo(this.getBreakAfterWork())
@@ -284,7 +292,7 @@ export class TimerEngine extends EventEmitter {
     this.state.remainingMs = 0
 
     this.notify(this.getPhaseTitle(), 'Timer complete!')
-    // this.playSound(sessionSoundPath);
+    this.playSound(sessionSoundPath);
 
     this.emit('timer-complete', this.getState())
     this.UpdateState()
@@ -313,7 +321,7 @@ export class TimerEngine extends EventEmitter {
     this.clearTick();
     this.state.status = 'paused';
 
-    // this.playSound(pauseSoundPath);
+    this.playSound(pauseSoundPath);
     this.UpdateState();
   }
 
@@ -342,7 +350,7 @@ export class TimerEngine extends EventEmitter {
     )
     this.clearTick()
 
-    // this.playSound(skipSoundPath);
+    this.playSound(skipSoundPath);
     this.state.skippedPhases += 1
 
     if (this.state.phase === 'work') {
